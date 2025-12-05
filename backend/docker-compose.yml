@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  pcap-analyzer:
+    build: .
+    container_name: pcap-analyzer
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+    restart: always
