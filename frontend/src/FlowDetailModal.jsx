@@ -13,70 +13,15 @@ import {
   Check,
   AlertTriangle,
 } from "lucide-react";
+import { formatBytes, formatDuration, formatTimestamp } from "./lib/utils";
+import InfoRow from "./components/InfoRow.jsx";
 
-const InfoRow = ({ label, value, copyable = false, field = "" }) => (
-  <div className="flex justify-between items-center py-2 border-b border-gray-100">
-    <span className="text-sm font-medium text-gray-600">{label}</span>
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-gray-900 font-mono">{value ?? "N/A"}</span>
-      {copyable && (
-        <CopyButton text={value} field={field} copiedField copyToClipboard />
-      )}
-    </div>
-  </div>
-);
-
-const CopyButton = ({ text, field, copyToClipboard, copiedField }) => (
-  <button
-    onClick={() => copyToClipboard(text, field)}
-    className="p-1 hover:bg-gray-100 rounded transition-colors"
-    title="Copy to clipboard"
-  >
-    {copiedField === field ? (
-      <Check className="w-4 h-4 text-green-600" />
-    ) : (
-      <Copy className="w-4 h-4 text-gray-400" />
-    )}
-  </button>
-);
 const FlowDetailModal = ({ flow, onClose }) => {
-  const [copiedField, setCopiedField] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
 
   if (!flow) return null;
   const flowData = flow.flow || flow;
   const ft = flowData.five_tuple || {};
-
-  const copyToClipboard = async (text, field) => {
-    try {
-      await navigator.clipboard.writeText(String(text ?? ""));
-      setCopiedField(field);
-      setTimeout(() => setCopiedField(null), 2000);
-    } catch {
-      // ignore
-    }
-  };
-
-  const formatBytes = (bytes) => {
-    if (!bytes && bytes !== 0) return "N/A";
-    if (bytes === 0) return "0 B";
-    const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  const formatTimestamp = (ts) => {
-    if (!ts) return "N/A";
-    return new Date(ts * 1000).toLocaleString();
-  };
-
-  const formatDuration = (duration) => {
-    if (duration == null) return "N/A";
-    if (duration < 1) return `${(duration * 1000).toFixed(0)} ms`;
-    if (duration < 60) return `${duration.toFixed(2)} s`;
-    return `${(duration / 60).toFixed(2)} m`;
-  };
 
   const calculateRate = () => {
     if (!flowData.duration || flowData.duration === 0) return "N/A";
